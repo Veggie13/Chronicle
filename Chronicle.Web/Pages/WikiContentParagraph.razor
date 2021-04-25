@@ -1,0 +1,13 @@
+﻿@if (Content.Properties.Contains("p"))
+{
+    <p><WikiContentBold Content="@Content" /></p>
+}
+else
+{
+    <WikiContentBold Content="@Content" />
+}
+
+@code {
+    [Parameter]
+    public Content Content { get; set; }
+}

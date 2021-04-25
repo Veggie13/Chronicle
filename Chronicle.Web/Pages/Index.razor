@@ -1,0 +1,30 @@
+﻿@page "/"
+@inject NavigationManager NavigationManager
+
+<h1>Chronicle</h1>
+
+<EditForm EditContext="@Context" OnValidSubmit="@GoToPage">
+    <p>
+        <label>
+            Page Title:
+            <InputText @bind-Value="Title" />
+        </label>
+    </p>
+
+    <button type="submit">GO</button>
+</EditForm>
+
+@code {
+    public string Title { get; set; }
+    public EditContext Context { get; set; }
+
+    protected override void OnInitialized()
+    {
+        Context = new EditContext(new object());
+    }
+
+    public void GoToPage()
+    {
+        NavigationManager.NavigateTo($"/pages/{Title}");
+    }
+}

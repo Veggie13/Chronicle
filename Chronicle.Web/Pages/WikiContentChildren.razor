@@ -1,0 +1,10 @@
+﻿<WikiContentLink Content="@Content" />
+@foreach (var childContent in Content.Children)
+{
+    <WikiContentParagraph Content="@childContent" />
+}
+
+@code {
+    [Parameter]
+    public Content Content { get; set; }
+}

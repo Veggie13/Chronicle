@@ -1,0 +1,21 @@
+﻿@page "/pages/{title}"
+@inject IPageStore PageStore
+
+<h3>@Title</h3>
+
+@foreach (var block in Page.ContentBlocks)
+{
+    <WikiContentParagraph Content="@block.Content" />
+}
+
+@code {
+    [Parameter]
+    public string Title { get; set; }
+
+    public Page Page { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        Page = PageStore.GetPage(Title);
+    }
+}

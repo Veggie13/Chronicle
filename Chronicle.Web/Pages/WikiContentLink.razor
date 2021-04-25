@@ -1,0 +1,13 @@
+﻿@if (string.IsNullOrEmpty(Content.Link))
+{
+    @Content.Text
+}
+else
+{
+    <a href="/pages/@Content.Link">@Content.Text</a>
+}
+
+@code {
+    [Parameter]
+    public Content Content { get; set; }
+}

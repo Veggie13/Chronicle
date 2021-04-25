@@ -1,0 +1,13 @@
+﻿@if (Content.Properties.Contains("i"))
+{
+    <i><WikiContentChildren Content="@Content" /></i>
+}
+else
+{
+    <WikiContentChildren Content="@Content" />
+}
+
+@code {
+    [Parameter]
+    public Content Content { get; set; }
+}

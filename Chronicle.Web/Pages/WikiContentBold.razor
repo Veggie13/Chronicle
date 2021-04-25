@@ -1,0 +1,13 @@
+﻿@if (Content.Properties.Contains("b"))
+{
+    <b><WikiContentItalic Content="@Content" /></b>
+}
+else
+{
+    <WikiContentItalic Content="@Content" />
+}
+
+@code {
+    [Parameter]
+    public Content Content { get; set; }
+}
