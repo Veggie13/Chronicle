@@ -4,28 +4,33 @@ using System.Text;
 
 namespace Chronicle
 {
-    public class User : IPermittable
+    public class User : IPermittable, IEquatable<User>
     {
         public string Name { get; set; }
 
         public bool IsPermitted(User user)
         {
-            return user == this;
-        }
-
-        public static bool operator ==(User a, User b)
-        {
-            return a.Name == b.Name;
-        }
-
-        public static bool operator !=(User a, User b)
-        {
-            return !(a == b);
+            return this.Equals(user);
         }
 
         public override string ToString()
         {
             return $"a({Name})";
+        }
+
+        public bool Equals(User other)
+        {
+            return other != null && Name == other.Name;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return this.Equals(obj as User);
+        }
+
+        public override int GetHashCode()
+        {
+            return Name.GetHashCode();
         }
     }
 }
