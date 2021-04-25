@@ -6,6 +6,10 @@ namespace Chronicle
 {
     public interface IPageStore
     {
+        IEnumerable<Page> Pages { get; }
+
+        bool PageExists(string title);
         Page GetPage(string title);
+        void AddPage(Page page);
     }
 }

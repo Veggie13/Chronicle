@@ -18,6 +18,9 @@ namespace Chronicle.Tests
             userStore.AddUser(new User() { Name = "Delta" });
 
             var page = Page.Parse(@"
+title(Test Page)
+editors(a(Beta))
+
 [[[
 This is the first block
 ]]]
