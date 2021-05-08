@@ -3,16 +3,26 @@
 
 <h1>Chronicle</h1>
 
-<EditForm EditContext="@Context" OnValidSubmit="@GoToPage">
-    <p>
-        <label>
-            Page Title:
-            <InputText @bind-Value="Title" />
-        </label>
-    </p>
+<AuthorizeView>
+    <Authorized Context="Auth">
+        <EditForm EditContext="@Context" OnValidSubmit="@GoToPage">
+            <p>
+                <label>
+                    Page Title:
+                    <InputText @bind-Value="Title" />
+                </label>
+            </p>
 
-    <button type="submit">GO</button>
-</EditForm>
+            <button type="submit">GO</button>
+        </EditForm>
+    </Authorized>
+
+    <NotAuthorized>
+        <p>
+            Please log in.
+        </p>
+    </NotAuthorized>
+</AuthorizeView>
 
 @code {
     public string Title { get; set; }

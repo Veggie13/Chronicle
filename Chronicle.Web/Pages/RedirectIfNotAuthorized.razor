@@ -1,0 +1,20 @@
+﻿@inject NavigationManager NavigationManager 
+
+<AuthorizeView>
+    <Authorized />
+    <NotAuthorized>
+        @{ Authorized = false; }
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    bool Authorized { get; set; } = true;
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if (!Authorized)
+        {
+            NavigationManager.NavigateTo("/");
+        }
+    }
+}

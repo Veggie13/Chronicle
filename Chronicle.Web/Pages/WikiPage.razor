@@ -1,6 +1,8 @@
 ﻿@page "/pages/{title}"
 @inject IPageStore PageStore
 
+<RedirectIfNotAuthorized />
+
 <h3>@Title</h3>
 
 @foreach (var block in Page.ContentBlocks)
