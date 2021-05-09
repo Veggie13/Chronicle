@@ -76,7 +76,8 @@ namespace Chronicle
                         break;
                 }
             }
-            
+
+            ContentBlocks.Clear();
             for (; lineNum < lines.Length; )
             {
                 string line = lines[lineNum];

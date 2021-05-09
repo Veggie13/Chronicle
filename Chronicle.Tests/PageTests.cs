@@ -38,6 +38,10 @@ This block [[Page2|has a link]] and special permissions
 
 ", userStore, pageStore);
 
+            var page2 = new Page();
+            page2.Parse(page.ToString(), userStore, pageStore);
+
+            Assert.AreEqual(page.ToString(), page2.ToString());
         }
     }
 }

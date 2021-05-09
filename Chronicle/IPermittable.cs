@@ -50,7 +50,7 @@ namespace Chronicle
         public static IPermittable Parse(string permitString, IUserStore userStore, Func<IUserStore, string, User> userParseStrategy)
         {
             var itemPattern = new Regex(@"a *\( *([A-Za-z0-9_\-\{\}]+) *\)");
-            var groupPattern = new Regex(@"([uie]) *\( *p([0-9]+) *(\, *p([0-9]+) *)*\)");
+            var groupPattern = new Regex(@"([uie]) *\( *(p([0-9]+) *(\, *p([0-9]+) *)*)?\)");
 
             var items = new List<IPermittable>();
             while (itemPattern.IsMatch(permitString))
@@ -64,8 +64,8 @@ namespace Chronicle
             while (groupPattern.IsMatch(permitString))
             {
                 var match = groupPattern.Match(permitString);
-                IEnumerable<IPermittable> groupItems = new[] { items[int.Parse(match.Groups[2].Value)] };
-                groupItems = groupItems.Concat(match.Groups[4].Captures.Select(c => items[int.Parse(c.Value)]));
+                IEnumerable<IPermittable> groupItems = match.Groups[3].Captures.Select(c => items[int.Parse(c.Value)]);
+                groupItems = groupItems.Concat(match.Groups[5].Captures.Select(c => items[int.Parse(c.Value)]));
                 permitString = groupPattern.Replace(permitString, $"p{items.Count}", 1);
                 switch (match.Groups[1].Value)
                 {

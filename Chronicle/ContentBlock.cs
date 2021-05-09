@@ -11,14 +11,14 @@ namespace Chronicle
 
         public string Serialized()
         {
-            return $"[[[{ViewPermission.Serialized()}\r\n"
+            return $"[[[viewers({ViewPermission.Serialized()})\r\n"
                 + Content.ToString()
                 + "\r\n]]]";
         }
 
         public override string ToString()
         {
-            return $"[[[{ViewPermission}\r\n"
+            return $"[[[viewers({ViewPermission})\r\n"
                 + Content.ToString()
                 + "\r\n]]]";
         }

@@ -28,5 +28,16 @@ namespace Chronicle.Tests
             Assert.IsFalse(permittable.IsPermitted(userStore.GetUser("Gamma")));
             Assert.IsTrue(permittable.IsPermitted(userStore.GetUser("Delta")));
         }
+
+        [TestMethod]
+        public void PrimitiveTest()
+        {
+            var userStore = new UserStore();
+            var all = Permittable.Parse(Permittable.All.ToString(), userStore);
+            var none = Permittable.Parse(Permittable.None.ToString(), userStore);
+
+            Assert.AreEqual(Permittable.All.ToString(), all.ToString());
+            Assert.AreEqual(Permittable.None.ToString(), none.ToString());
+        }
     }
 }
