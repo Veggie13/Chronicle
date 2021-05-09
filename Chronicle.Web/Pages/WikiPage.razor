@@ -1,23 +1,37 @@
 ﻿@page "/pages/{title}"
 @inject IPageStore PageStore
+@inject IUserStore UserStore
+@using System.Linq
 
 <RedirectIfNotAuthorized />
 
 <h3>@Title</h3>
 
-@foreach (var block in Page.ContentBlocks)
+@foreach (var block in Page.ContentBlocks.Where(cb => cb.ViewPermission.IsPermitted(User)))
 {
     <WikiContentParagraph Content="@block.Content" />
 }
 
 @code {
+    [CascadingParameter]
+    Task<AuthenticationState> AuthenticationStateTask { get; set; }
+
     [Parameter]
     public string Title { get; set; }
 
     public Page Page { get; set; }
+    public User User { get; set; }
 
-    protected override void OnParametersSet()
+    protected override async Task OnParametersSetAsync()
     {
+        await base.OnParametersSetAsync();
+
         Page = PageStore.GetPage(Title);
+
+        var authState = await AuthenticationStateTask;
+        if (UserStore.HasUser(authState.User.Identity.Name))
+        {
+            User = UserStore.GetUser(authState.User.Identity.Name);
+        }
     }
 }
