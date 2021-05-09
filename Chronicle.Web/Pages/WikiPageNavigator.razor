@@ -1,0 +1,31 @@
+﻿@inject NavigationManager NavigationManager
+ 
+<EditForm EditContext="@Context" OnValidSubmit="@GoToPage">
+    @if (ShowIndex)
+    {
+        <a href="/">Index</a> @:|
+    }
+    <label>
+        Page Title:
+        <InputText @bind-Value="Title" />
+        <button type="submit">GO</button>
+    </label>
+</EditForm>
+
+@code {
+    [Parameter]
+    public bool ShowIndex { get; set; } = true;
+
+    public EditContext Context { get; set; }
+    public string Title { get; set; }
+
+    protected override void OnInitialized()
+    {
+        Context = new EditContext(new object());
+    }
+
+    public void GoToPage()
+    {
+        NavigationManager.NavigateTo($"/pages/{Title}");
+    }
+}

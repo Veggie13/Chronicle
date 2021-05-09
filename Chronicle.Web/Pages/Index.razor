@@ -1,40 +1,25 @@
 ﻿@page "/"
-@inject NavigationManager NavigationManager
-
-<h1>Chronicle</h1>
+@inject IPageStore PageStore
 
 <AuthorizeView>
     <Authorized Context="Auth">
-        <EditForm EditContext="@Context" OnValidSubmit="@GoToPage">
-            <p>
-                <label>
-                    Page Title:
-                    <InputText @bind-Value="Title" />
-                </label>
-            </p>
+        <WikiPageNavigator ShowIndex="false" />
 
-            <button type="submit">GO</button>
-        </EditForm>
+        <h1>Chronicle</h1>
+
+        <p>
+            @foreach (var storedPage in PageStore.Pages.OrderBy(p => p.Title))
+            {
+                <a href="/pages/@storedPage.Title">@storedPage.Title</a><br />
+            }
+        </p>
     </Authorized>
 
     <NotAuthorized>
+        <h1>Chronicle</h1>
+
         <p>
             Please log in.
         </p>
     </NotAuthorized>
 </AuthorizeView>
-
-@code {
-    public string Title { get; set; }
-    public EditContext Context { get; set; }
-
-    protected override void OnInitialized()
-    {
-        Context = new EditContext(new object());
-    }
-
-    public void GoToPage()
-    {
-        NavigationManager.NavigateTo($"/pages/{Title}");
-    }
-}

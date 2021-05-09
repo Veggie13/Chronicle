@@ -5,6 +5,8 @@
 
 <RedirectIfNotAuthorized />
 
+<WikiPageNavigator />
+
 <h3>@Title</h3>
 
 @foreach (var block in Page.ContentBlocks.Where(cb => cb.ViewPermission.IsPermitted(User)))
