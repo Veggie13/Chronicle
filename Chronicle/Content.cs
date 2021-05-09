@@ -13,6 +13,21 @@ namespace Chronicle
         public Page Link { get; set; }
         public IList<Content> Children { get; set; } = new List<Content>();
 
+        public string Serialized()
+        {
+            return (Properties.Contains("p") ? "\r\n" : "")
+                + (Properties.Contains("b") ? "**" : "")
+                + (Properties.Contains("i") ? "*" : "")
+                + ((Link != null) ? $"[[{Link.ID}" : "")
+                + ((Link != null) && Link.Title != Text ? $"|{Text}" : "")
+                + ((Link != null) ? "]]" : "")
+                + ((Link == null) ? Text : "")
+                + string.Join("", Children.Select(c => c.Serialized()))
+                + (Properties.Contains("i") ? "*" : "")
+                + (Properties.Contains("b") ? "**" : "")
+                + (Properties.Contains("p") ? "\r\n" : "");
+        }
+
         public override string ToString()
         {
             return (Properties.Contains("p") ? "\r\n" : "")

@@ -12,7 +12,7 @@ namespace Chronicle
         public string Serialized()
         {
             return $"[[[viewers({ViewPermission.Serialized()})\r\n"
-                + Content.ToString()
+                + Content.Serialized()
                 + "\r\n]]]";
         }
 
