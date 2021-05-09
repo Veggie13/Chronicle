@@ -7,10 +7,15 @@ namespace Chronicle
 {
     public class FileUserStore : IUserStore
     {
-        private Dictionary<string, User> _users = new Dictionary<string, User>();
+        private IUserStore _backingStore;
 
         public FileUserStore(FileApplicationContext context)
+            : this(context, new UserStore())
+        { }
+
+        public FileUserStore(FileApplicationContext context, IUserStore backingStore)
         {
+            _backingStore = backingStore;
             Context = context;
 
             var lines = new List<string>();
@@ -31,20 +36,35 @@ namespace Chronicle
 
                 var cells = line.Split('\t');
 
-                var user = new User()
+                _backingStore.AddUser(new User()
                 {
                     Name = cells[0],
                     Password = HashedPassword.FromHash(cells[1])
-                };
-                _users[user.Name] = user;
+                });
             }
         }
 
         public FileApplicationContext Context { get; private set; }
+        public IEnumerable<User> Users { get { return _backingStore.Users; } }
+
+        public bool HasUser(string userName)
+        {
+            return _backingStore.HasUser(userName);
+        }
 
         public User GetUser(string userName)
         {
-            return _users[userName];
+            return _backingStore.GetUser(userName);
+        }
+
+        public void AddUser(User user)
+        {
+            _backingStore.AddUser(user);
+            
+            using (var writer = new StreamWriter(Context.UserListFile.FullName, false))
+            {
+                writer.WriteLine($"{user.Name}\t{user.Password}");
+            }
         }
     }
 }

@@ -8,9 +8,19 @@ namespace Chronicle
     {
         private Dictionary<string, User> _users = new Dictionary<string, User>();
 
+        public IEnumerable<User> Users
+        {
+            get { return _users.Values; }
+        }
+
         public void AddUser(User user)
         {
             _users[user.Name] = user;
+        }
+
+        public bool HasUser(string name)
+        {
+            return _users.ContainsKey(name);
         }
 
         public User GetUser(string name)
