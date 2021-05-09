@@ -1,0 +1,90 @@
+﻿@page "/edit/{title}"
+@inject IPageStore PageStore
+@inject IUserStore UserStore
+@inject NavigationManager NavigationManager
+
+<RedirectIfNotAuthorized>
+    <Contents>
+        <EditForm EditContext="@Context" OnValidSubmit="@SavePage">
+            <table width="100%">
+                <tr>
+                    <td width="50%">
+                        <h3>Editing: @Title</h3>
+                    </td>
+                    <td align="right" width="50%">
+                        <button type="submit">Save</button>
+                    </td>
+                    <td align="right">
+                        <button type="button" @onclick="@cancel">Cancel</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="3" width="100%">
+                        <InputTextArea style="width: 100%; height: 1000px;" @bind-Value="@Content" />
+                    </td>
+                </tr>
+            </table>
+        </EditForm>
+    </Contents>
+</RedirectIfNotAuthorized>
+
+@code {
+    [CascadingParameter]
+    Task<AuthenticationState> AuthenticationStateTask { get; set; }
+
+    [Parameter]
+    public string Title { get; set; }
+
+    public EditContext Context { get; set; }
+    public string Content { get; set; }
+
+    public Page Page { get; set; }
+    public User User { get; set; }
+
+    public bool CanUserEdit
+    {
+        get { return Page.Author == User || Page.EditPermission.IsPermitted(User); }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+
+        var authState = await AuthenticationStateTask;
+        if (authState?.User?.Identity?.Name == null)
+        {
+            return;
+        }
+
+        if (UserStore.HasUser(authState.User.Identity.Name))
+        {
+            User = UserStore.GetUser(authState.User.Identity.Name);
+        }
+
+        Page = PageStore.GetPage(Title);
+        Content = Page.ToString();
+
+        if (!CanUserEdit)
+        {
+            NavigationManager.NavigateTo($"/pages/{Title}");
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        Context = new EditContext(new object());
+    }
+
+    public void SavePage()
+    {
+        Page.Parse(Content, UserStore, PageStore);
+        PageStore.UpdatePage(Page);
+        NavigationManager.NavigateTo($"/pages/{Page.Title}");
+    }
+
+    void cancel()
+    {
+        NavigationManager.NavigateTo($"/pages/{Title}");
+    }
+}

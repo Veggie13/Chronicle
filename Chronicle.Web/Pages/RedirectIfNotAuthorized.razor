@@ -1,13 +1,21 @@
-﻿@inject NavigationManager NavigationManager 
+﻿@inject NavigationManager NavigationManager
 
 <AuthorizeView>
-    <Authorized />
+    <Authorized>
+        @if (Contents != null)
+        {
+            @Contents
+        }
+    </Authorized>
     <NotAuthorized>
         @{ Authorized = false; }
     </NotAuthorized>
 </AuthorizeView>
 
 @code {
+    [Parameter]
+    public RenderFragment Contents { get; set; }
+
     bool Authorized { get; set; } = true;
     protected override void OnAfterRender(bool firstRender)
     {

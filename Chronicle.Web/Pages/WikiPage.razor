@@ -1,18 +1,37 @@
 ﻿@page "/pages/{title}"
 @inject IPageStore PageStore
 @inject IUserStore UserStore
+@inject NavigationManager NavigationManager 
 @using System.Linq
 
-<RedirectIfNotAuthorized />
+<RedirectIfNotAuthorized>
+    <Contents>
+        <table width="100%">
+            <tr>
+                <td width="50%">
+                    <h3>@Title</h3>
+                    <small>
+                        Created by @Page.Author.Name
+                        @if (CanUserEdit)
+                        {
+                            @:|
+                            <a href="#" @onclick="@editPage">EDIT</a>
+                        }
+                    </small>
+                </td>
+                <td width="50%" align="right">
+                    <WikiPageNavigator />
+                </td>
+            </tr>
+        </table>
+        <hr />
 
-<WikiPageNavigator />
-
-<h3>@Title</h3>
-
-@foreach (var block in Page.ContentBlocks.Where(cb => cb.ViewPermission.IsPermitted(User)))
-{
-    <WikiContentParagraph Content="@block.Content" />
-}
+        @foreach (var block in Page.ContentBlocks.Where(cb => Page.Author == User || cb.ViewPermission.IsPermitted(User)))
+        {
+            <WikiContentParagraph Content="@block.Content" />
+        }
+    </Contents>
+</RedirectIfNotAuthorized>
 
 @code {
     [CascadingParameter]
@@ -24,16 +43,31 @@
     public Page Page { get; set; }
     public User User { get; set; }
 
+    public bool CanUserEdit
+    {
+        get { return Page.Author == User || Page.EditPermission.IsPermitted(User); }
+    }
+
     protected override async Task OnParametersSetAsync()
     {
         await base.OnParametersSetAsync();
 
-        Page = PageStore.GetPage(Title);
-
         var authState = await AuthenticationStateTask;
+        if (authState?.User?.Identity?.Name == null)
+        {
+            return;
+        }
+
         if (UserStore.HasUser(authState.User.Identity.Name))
         {
             User = UserStore.GetUser(authState.User.Identity.Name);
         }
+
+        Page = PageStore.GetPage(Title);
+    }
+
+    void editPage()
+    {
+        NavigationManager.NavigateTo($"/edit/{Title}");
     }
 }

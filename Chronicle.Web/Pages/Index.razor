@@ -3,9 +3,9 @@
 
 <AuthorizeView>
     <Authorized Context="Auth">
-        <WikiPageNavigator ShowIndex="false" />
+        <h1>Chronicle</h1><hr />
 
-        <h1>Chronicle</h1>
+        <WikiPageNavigator ShowIndex="false" />
 
         <p>
             @foreach (var storedPage in PageStore.Pages.OrderBy(p => p.Title))
