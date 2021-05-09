@@ -19,6 +19,11 @@ namespace Chronicle
             return Items.Any(p => p.IsPermitted(user));
         }
 
+        public string Serialized()
+        {
+            return $"u({string.Join(',', Items.Select(i => i.Serialized()))})";
+        }
+
         public override string ToString()
         {
             return $"u({string.Join(',', Items.Select(i => i.ToString()))})";

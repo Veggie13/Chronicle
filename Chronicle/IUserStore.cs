@@ -9,7 +9,9 @@ namespace Chronicle
         IEnumerable<User> Users { get; }
 
         bool HasUser(string name);
+        User GetUser(Guid id);
         User GetUser(string name);
         void AddUser(User user);
+        void UpdateUser(User user);
     }
 }

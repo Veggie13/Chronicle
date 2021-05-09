@@ -9,6 +9,7 @@ namespace Chronicle
     public interface IPermittable
     {
         bool IsPermitted(User user);
+        string Serialized();
     }
 
     public static class Permittable
@@ -46,17 +47,17 @@ namespace Chronicle
             return new PermittableExclusion() { Items = { @this, item } };
         }
 
-        public static IPermittable Parse(string permitString, IUserStore userStore)
+        public static IPermittable Parse(string permitString, IUserStore userStore, Func<IUserStore, string, User> userParseStrategy)
         {
-            var itemPattern = new Regex(@"a *\( *([A-Za-z0-9_]+) *\)");
+            var itemPattern = new Regex(@"a *\( *([A-Za-z0-9_\-\{\}]+) *\)");
             var groupPattern = new Regex(@"([uie]) *\( *p([0-9]+) *(\, *p([0-9]+) *)*\)");
 
             var items = new List<IPermittable>();
             while (itemPattern.IsMatch(permitString))
             {
                 var match = itemPattern.Match(permitString);
-                string itemName = match.Groups[1].Value;
-                var user = userStore.GetUser(itemName);
+                string itemStr = match.Groups[1].Value;
+                var user = userParseStrategy(userStore, itemStr);
                 permitString = itemPattern.Replace(permitString, $"p{items.Count}", 1);
                 items.Add(user);
             }
@@ -83,6 +84,11 @@ namespace Chronicle
             }
 
             return items[items.Count - 1];
+        }
+
+        public static IPermittable Parse(string permitString, IUserStore userStore)
+        {
+            return Parse(permitString, userStore, (us, str) => us.GetUser(str));
         }
     }
 }

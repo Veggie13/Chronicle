@@ -11,5 +11,6 @@ namespace Chronicle
         bool PageExists(string title);
         Page GetPage(string title);
         void AddPage(Page page);
+        void UpdatePage(Page page);
     }
 }

@@ -38,8 +38,9 @@ namespace Chronicle
 
                 _backingStore.AddUser(new User()
                 {
-                    Name = cells[0],
-                    Password = HashedPassword.FromHash(cells[1])
+                    ID = new Guid(cells[0]),
+                    Name = cells[1],
+                    Password = HashedPassword.FromHash(cells[2])
                 });
             }
         }
@@ -57,13 +58,35 @@ namespace Chronicle
             return _backingStore.GetUser(userName);
         }
 
+        public User GetUser(Guid id)
+        {
+            return _backingStore.GetUser(id);
+        }
+
         public void AddUser(User user)
         {
             _backingStore.AddUser(user);
             
+            using (var writer = new StreamWriter(Context.UserListFile.FullName, true))
+            {
+                writer.WriteLine($"{user.ID}\t{user.Name}\t{user.Password}");
+            }
+        }
+
+        public void UpdateUser(User user)
+        {
+            _backingStore.UpdateUser(user);
+            writeUsers();
+        }
+
+        private void writeUsers()
+        {
             using (var writer = new StreamWriter(Context.UserListFile.FullName, false))
             {
-                writer.WriteLine($"{user.Name}\t{user.Password}");
+                foreach (var user in Users)
+                {
+                    writer.WriteLine($"{user.ID}\t{user.Name}\t{user.Password}");
+                }
             }
         }
     }

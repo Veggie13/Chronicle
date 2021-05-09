@@ -6,7 +6,7 @@ This is the first block
 
 This is the naked second block **with** *formatting*
 
-[[[ viewers(a(Gamma))
-This block [[Page2|has a link]] and special permissions
+[[[ viewers(a({610B4900-CC5F-4971-B4D4-E50D87BB7F94}))
+This block [[{4116B536-5D8D-44A9-BA88-575B3810EB04}|has a link]] and special permissions
 ]]]
 

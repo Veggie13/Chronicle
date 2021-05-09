@@ -7,11 +7,19 @@ namespace Chronicle
 {
     public class Page
     {
+        public Guid ID { get; internal set; }
         public string Title { get; set; }
         public User Author { get; set; }
         public IPermittable EditPermission { get; set; } = Permittable.None;
         public IPermittable ViewPermission { get; set; } = Permittable.All;
         public IList<ContentBlock> ContentBlocks { get; set; } = new List<ContentBlock>();
+
+        public string Serialized()
+        {
+            return $"editors({EditPermission.Serialized()})\r\n"
+                + $"viewers({ViewPermission.Serialized()})\r\n"
+                + string.Join("\r\n", ContentBlocks.Select(b => b.Serialized()));
+        }
 
         public override string ToString()
         {
@@ -22,6 +30,16 @@ namespace Chronicle
         }
 
         public static Page Parse(string source, IUserStore userStore)
+        {
+            return parse(source, userStore, (us, str) => us.GetUser(str));
+        }
+
+        public static Page Deserialize(string source, IUserStore userStore)
+        {
+            return parse(source, userStore, (us, str) => us.GetUser(new Guid(str)));
+        }
+
+        private static Page parse(string source, IUserStore userStore, Func<IUserStore, string, User> userParseStrategy)
         {
             var whitespacePattern = new Regex(@"^[ \t]*$");
             var titleBlockPattern = new Regex(@"^[ \t]*(title|editors|viewers)[ \t]*\((.*)\)[ \t]*$");
@@ -53,10 +71,10 @@ namespace Chronicle
                         page.Title = match.Groups[2].Value;
                         break;
                     case "editors":
-                        page.EditPermission = Permittable.Parse(match.Groups[2].Value, userStore);
+                        page.EditPermission = Permittable.Parse(match.Groups[2].Value, userStore, userParseStrategy);
                         break;
                     case "viewers":
-                        page.ViewPermission = Permittable.Parse(match.Groups[2].Value, userStore);
+                        page.ViewPermission = Permittable.Parse(match.Groups[2].Value, userStore, userParseStrategy);
                         break;
                 }
             }
@@ -79,7 +97,7 @@ namespace Chronicle
                     var match = blockStartPattern.Match(line);
                     if (match.Groups[1].Length > 0)
                     {
-                        block.ViewPermission = Permittable.Parse(match.Groups[1].Value, userStore);
+                        block.ViewPermission = Permittable.Parse(match.Groups[1].Value, userStore, userParseStrategy);
                     }
                     lineNum++;
                 }
