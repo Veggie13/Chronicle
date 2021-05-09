@@ -49,6 +49,7 @@ namespace Chronicle.Web
             PageStore = new FilePageStore(Context, UserStore);
 
             services.AddSingleton<Chronicle.IPageStore>(PageStore);
+            services.AddSingleton<Chronicle.IUserStore>(UserStore);
 
             services.AddHttpContextAccessor();
             services.AddScoped<HttpContextAccessor>();

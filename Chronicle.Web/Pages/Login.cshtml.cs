@@ -14,6 +14,13 @@ namespace Chronicle.Web.Pages
     [AllowAnonymous]
     public class LoginModel : PageModel
     {
+        IUserStore _userStore;
+
+        public LoginModel(IUserStore userStore)
+        {
+            _userStore = userStore;
+        }
+
         public string ReturnUrl { get; set; }
 
         public async Task<IActionResult> OnGetAsync(string paramUsername, string paramPassword)
@@ -29,14 +36,21 @@ namespace Chronicle.Web.Pages
             }
             catch { }
 
-            // *** !!! This is where you would validate the user !!! ***
-            // In this example we just log the user in
-            // (Always log the user in for this demo)
+            if (!_userStore.HasUser(paramUsername))
+            {
+                return LocalRedirect(returnUrl);
+            }
+
+            var user = _userStore.GetUser(paramUsername);
+            if (!user.Password.Equals(paramPassword))
+            {
+                return LocalRedirect(returnUrl);
+            }
 
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, paramUsername),
-                new Claim(ClaimTypes.Role, "Administrator"),
+                new Claim(ClaimTypes.Role, "Standard"),
             };
 
             var claimsIdentity = new ClaimsIdentity(
