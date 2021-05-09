@@ -12,8 +12,8 @@ namespace Chronicle.Tests
         static IEnumerable<object[]> generatePasswords()
         {
             string alphabet = "`1234567890-=qwertyuiop[]\\asdfghjkl;'zxcvbnm,./~!@#$%^&*()_+QWERTYUIOP{}|ASDFGHJKL:\"ZXCVBNM<>? ";
-            var rand = new Random((int)0x0dedbeef);
-            for (int i = 0; i < 1000; i++)
+            var rand = new Random();
+            for (int i = 0; i < 100; i++)
             {
                 int length = rand.Next(1, 64);
                 yield return new[] { new string(Enumerable.Range(0, length).Select(_ => alphabet[rand.Next(0, alphabet.Length)]).ToArray()) };
