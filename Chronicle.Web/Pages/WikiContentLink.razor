@@ -1,10 +1,10 @@
-﻿@if (string.IsNullOrEmpty(Content.Link))
+﻿@if (Content.Link == null)
 {
     @Content.Text
 }
 else
 {
-    <a href="/pages/@Content.Link">@Content.Text</a>
+    <a href="/pages/@Content.Link.Title">@Content.Text</a>
 }
 
 @code {
