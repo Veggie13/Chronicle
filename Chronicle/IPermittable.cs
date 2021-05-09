@@ -14,8 +14,8 @@ namespace Chronicle
 
     public static class Permittable
     {
-        public static IPermittable None { get; } = new PermittableIntersection();
-        public static IPermittable All { get; } = new PermittableExclusion();
+        public static IPermittable None { get; } = new PermittableUnion();
+        public static IPermittable All { get; } = new PermittableIntersection();
 
         public static PermittableUnion United(this IEnumerable<IPermittable> @this)
         {
