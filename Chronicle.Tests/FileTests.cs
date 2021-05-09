@@ -16,6 +16,8 @@ namespace Chronicle.Tests
             var userStore = new FileUserStore(context);
             var pageStore = new FilePageStore(context, userStore);
 
+            Assert.AreEqual(userStore.GetUser("Alpha").Password, "hunter1");
+
             var page1 = pageStore.GetPage("Page1");
             string page1String = page1.ToString();
 

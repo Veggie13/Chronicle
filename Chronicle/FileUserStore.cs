@@ -13,24 +13,30 @@ namespace Chronicle
         {
             Context = context;
 
-            var userNames = new List<string>();
+            var lines = new List<string>();
             using (var reader = new StreamReader(Context.UserListFile.FullName))
             {
                 while (!reader.EndOfStream)
                 {
-                    userNames.Add(reader.ReadLine());
+                    lines.Add(reader.ReadLine());
                 }
             }
 
-            foreach (string userName in userNames)
+            foreach (string line in lines)
             {
-                if (string.IsNullOrWhiteSpace(userName))
+                if (string.IsNullOrWhiteSpace(line))
                 {
                     continue;
                 }
 
-                var user = new User() { Name = userName };
-                _users[userName] = user;
+                var cells = line.Split('\t');
+
+                var user = new User()
+                {
+                    Name = cells[0],
+                    Password = HashedPassword.FromHash(cells[1])
+                };
+                _users[user.Name] = user;
             }
         }
 

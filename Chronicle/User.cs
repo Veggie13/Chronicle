@@ -7,6 +7,7 @@ namespace Chronicle
     public class User : IPermittable, IEquatable<User>
     {
         public string Name { get; set; }
+        public HashedPassword Password { get; set; }
 
         public bool IsPermitted(User user)
         {
