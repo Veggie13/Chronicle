@@ -69,6 +69,7 @@ namespace Chronicle
             
             using (var writer = new StreamWriter(Context.UserListFile.FullName, true))
             {
+                writer.WriteLine();
                 writer.WriteLine($"{user.ID}\t{user.Name}\t{user.Password}");
             }
         }

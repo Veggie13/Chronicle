@@ -78,12 +78,14 @@ namespace Chronicle
             _backingStore.AddPage(page);
             using (var writer = new StreamWriter(Context.IndexFile.FullName, true))
             {
+                writer.WriteLine();
                 writer.WriteLine($"{page.ID}\t{page.Title}\t{page.Title}.txt");
             }
             _pageFiles[page.ID] = new FileInfo(Path.Combine(Context.PageFolder.FullName, $"{page.Title}.txt"));
             writePage(page);
             using (var writer = new StreamWriter(Context.AuthorsFile.FullName, true))
             {
+                writer.WriteLine();
                 writer.WriteLine($"{page.ID}\t{page.Author.ID}");
             }
         }
