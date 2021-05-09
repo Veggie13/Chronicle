@@ -27,7 +27,9 @@ namespace Chronicle
                 authorsLines = reader.ReadToEnd().Split(new[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
             }
             var authorPattern = new Regex(@"^(.*)\t(.*)$");
-            var authors = authorsLines.ToDictionary(l => new Guid(authorPattern.Match(l).Groups[1].Value), l => new Guid(authorPattern.Match(l).Groups[2].Value));
+            var authors = authorsLines.ToDictionary(
+                l => new Guid(authorPattern.Match(l).Groups[1].Value),
+                l => new Guid(authorPattern.Match(l).Groups[2].Value));
 
             string[] indexLines;
             using (var reader = new StreamReader(Context.IndexFile.FullName))
@@ -35,13 +37,27 @@ namespace Chronicle
                 indexLines = reader.ReadToEnd().Split(new[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
             }
             var indexPattern = new Regex(@"^(.*)\t(.*)\t(.*)$");
-            var entries = indexLines.ToDictionary(
+            var titles = indexLines.ToDictionary(
                 l => new Guid(indexPattern.Match(l).Groups[1].Value),
-                l => new { Title = indexPattern.Match(l).Groups[2].Value, FileName = indexPattern.Match(l).Groups[3].Value });
+                l => indexPattern.Match(l).Groups[2].Value);
+            var fileNames = indexLines.ToDictionary(
+                l => new Guid(indexPattern.Match(l).Groups[1].Value),
+                l => indexPattern.Match(l).Groups[3].Value);
 
-            foreach (var entryKey in entries.Keys)
+            foreach (var id in titles.Keys)
             {
-                var pageInfo = Context.PageFolder.GetFiles(entries[entryKey].FileName)[0];
+                _backingStore.AddPage(new Page()
+                {
+                    ID = id,
+                    Title = titles[id],
+                    Author = userStore.GetUser(authors[id])
+                });
+            }
+
+            foreach (var page in Pages)
+            {
+                var pageInfo = Context.PageFolder.GetFiles(fileNames[page.ID])[0];
+                _pageFiles[page.ID] = pageInfo;
 
                 string content;
                 using (var reader = new StreamReader(pageInfo.FullName))
@@ -49,12 +65,7 @@ namespace Chronicle
                     content = reader.ReadToEnd();
                 }
 
-                var page = Page.Deserialize(content, userStore);
-                page.ID = entryKey;
-                page.Title = entries[entryKey].Title;
-                page.Author = userStore.GetUser(authors[page.ID]);
-                _backingStore.AddPage(page);
-                _pageFiles[page.ID] = pageInfo;
+                page.Deserialize(content, userStore, _backingStore);
             }
         }
 
@@ -75,6 +86,11 @@ namespace Chronicle
             {
                 writer.WriteLine($"{page.ID}\t{page.Author.ID}");
             }
+        }
+
+        public Page GetPage(Guid id)
+        {
+            return _backingStore.GetPage(id);
         }
 
         public Page GetPage(string title)

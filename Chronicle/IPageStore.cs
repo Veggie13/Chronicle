@@ -9,6 +9,7 @@ namespace Chronicle
         IEnumerable<Page> Pages { get; }
 
         bool PageExists(string title);
+        Page GetPage(Guid id);
         Page GetPage(string title);
         void AddPage(Page page);
         void UpdatePage(Page page);

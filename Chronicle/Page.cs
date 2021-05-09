@@ -29,24 +29,22 @@ namespace Chronicle
                 + string.Join("\r\n", ContentBlocks.Select(b => b.ToString()));
         }
 
-        public static Page Parse(string source, IUserStore userStore)
+        public void Parse(string source, IUserStore userStore, IPageStore pageStore)
         {
-            return parse(source, userStore, (us, str) => us.GetUser(str));
+            parse(source, userStore, (us, str) => us.GetUser(str), pageStore, (ps, str) => ps.GetPage(str));
         }
 
-        public static Page Deserialize(string source, IUserStore userStore)
+        public void Deserialize(string source, IUserStore userStore, IPageStore pageStore)
         {
-            return parse(source, userStore, (us, str) => us.GetUser(new Guid(str)));
+            parse(source, userStore, (us, str) => us.GetUser(new Guid(str)), pageStore, (ps, str) => ps.GetPage(new Guid(str)));
         }
 
-        private static Page parse(string source, IUserStore userStore, Func<IUserStore, string, User> userParseStrategy)
+        private void parse(string source, IUserStore userStore, Func<IUserStore, string, User> userParseStrategy, IPageStore pageStore, Func<IPageStore, string, Page> linkParseStrategy)
         {
             var whitespacePattern = new Regex(@"^[ \t]*$");
             var titleBlockPattern = new Regex(@"^[ \t]*(title|editors|viewers)[ \t]*\((.*)\)[ \t]*$");
             var blockStartPattern = new Regex(@"^\[\[\[([ \t]*viewers[ \t]*\((.*)\)[ \t]*)?$");
             var blockEndPattern = new Regex(@"^\]\]\]$");
-
-            var page = new Page();
 
             var lines = source.Split(new[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
             int lineNum = 0;
@@ -68,13 +66,13 @@ namespace Chronicle
                 switch (match.Groups[1].Value)
                 {
                     case "title":
-                        page.Title = match.Groups[2].Value;
+                        Title = match.Groups[2].Value;
                         break;
                     case "editors":
-                        page.EditPermission = Permittable.Parse(match.Groups[2].Value, userStore, userParseStrategy);
+                        EditPermission = Permittable.Parse(match.Groups[2].Value, userStore, userParseStrategy);
                         break;
                     case "viewers":
-                        page.ViewPermission = Permittable.Parse(match.Groups[2].Value, userStore, userParseStrategy);
+                        ViewPermission = Permittable.Parse(match.Groups[2].Value, userStore, userParseStrategy);
                         break;
                 }
             }
@@ -118,7 +116,7 @@ namespace Chronicle
                         break;
                     }
 
-                    var contentItem = Content.Parse(line);
+                    var contentItem = Content.Parse(line, pageStore, linkParseStrategy);
                     contentItem.Properties.Add("p");
                     contentItems.Add(contentItem);
                 }
@@ -135,10 +133,8 @@ namespace Chronicle
                     };
                 }
 
-                page.ContentBlocks.Add(block);
+                ContentBlocks.Add(block);
             }
-
-            return page;
         }
     }
 }

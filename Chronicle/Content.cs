@@ -10,7 +10,7 @@ namespace Chronicle
     {
         public string Text { get; set; } = "";
         public ISet<string> Properties { get; } = new HashSet<string>();
-        public string Link { get; set; } = "";
+        public Page Link { get; set; }
         public IList<Content> Children { get; set; } = new List<Content>();
 
         public override string ToString()
@@ -18,10 +18,10 @@ namespace Chronicle
             return (Properties.Contains("p") ? "\r\n" : "")
                 + (Properties.Contains("b") ? "**" : "")
                 + (Properties.Contains("i") ? "*" : "")
-                + (!string.IsNullOrEmpty(Link) ? "[[" : "")
-                + (!string.IsNullOrEmpty(Link) && Link != Text ? (Link + "|") : "")
+                + ((Link != null) ? "[[" : "")
+                + ((Link != null) && Link.Title != Text ? (Link.Title + "|") : "")
                 + Text
-                + (!string.IsNullOrEmpty(Link) ? "]]" : "")
+                + ((Link != null) ? "]]" : "")
                 + string.Join("", Children.Select(c => c.ToString()))
                 + (Properties.Contains("i") ? "*" : "")
                 + (Properties.Contains("b") ? "**" : "")
@@ -31,9 +31,9 @@ namespace Chronicle
         static readonly Regex formatPattern = new Regex(@"^(|.*[^\*])((\*){1,3})([^\*].*?)\2(.*)$");
         static readonly Regex linkPattern = new Regex(@"^(.*)\[\[(.*?)(\|(.*?))?\]\](.*)$");
 
-        public static Content Parse(string source)
+        public static Content Parse(string source, IPageStore pageStore, Func<IPageStore, string, Page> linkParseStrategy)
         {
-            var items = fork(source).ToList();
+            var items = fork(source, pageStore, linkParseStrategy).ToList();
             if (items.Count == 1)
             {
                 return items[0];
@@ -45,7 +45,17 @@ namespace Chronicle
             };
         }
 
-        private static IEnumerable<Content> fork(string source)
+        public static Content Parse(string source, IPageStore pageStore)
+        {
+            return Parse(source, pageStore, (ps, str) => ps.GetPage(str));
+        }
+
+        public static Content Deserialize(string source, IPageStore pageStore)
+        {
+            return Parse(source, pageStore, (ps, str) => ps.GetPage(new Guid(str)));
+        }
+
+        private static IEnumerable<Content> fork(string source, IPageStore pageStore, Func<IPageStore, string, Page> linkParseStrategy)
         {
             if (formatPattern.IsMatch(source))
             {
@@ -53,14 +63,14 @@ namespace Chronicle
 
                 if (!string.IsNullOrEmpty(match.Groups[1].Value))
                 {
-                    foreach (var leftItem in fork(match.Groups[1].Value))
+                    foreach (var leftItem in fork(match.Groups[1].Value, pageStore, linkParseStrategy))
                     {
                         yield return leftItem;
                     }
                 }
 
                 Content item;
-                var children = fork(match.Groups[4].Value).ToList();
+                var children = fork(match.Groups[4].Value, pageStore, linkParseStrategy).ToList();
                 if (children.Count > 1)
                 {
                     item = new Content()
@@ -93,7 +103,7 @@ namespace Chronicle
 
                 if (!string.IsNullOrEmpty(match.Groups[5].Value))
                 {
-                    foreach (var rightItem in fork(match.Groups[5].Value))
+                    foreach (var rightItem in fork(match.Groups[5].Value, pageStore, linkParseStrategy))
                     {
                         yield return rightItem;
                     }
@@ -105,7 +115,7 @@ namespace Chronicle
 
                 if (!string.IsNullOrEmpty(match.Groups[1].Value))
                 {
-                    foreach (var leftItem in fork(match.Groups[1].Value))
+                    foreach (var leftItem in fork(match.Groups[1].Value, pageStore, linkParseStrategy))
                     {
                         yield return leftItem;
                     }
@@ -113,7 +123,7 @@ namespace Chronicle
 
                 var item = new Content()
                 {
-                    Link = match.Groups[2].Value
+                    Link = linkParseStrategy(pageStore, match.Groups[2].Value)
                 };
                 if (string.IsNullOrEmpty(match.Groups[4].Value))
                 {
@@ -128,7 +138,7 @@ namespace Chronicle
 
                 if (!string.IsNullOrEmpty(match.Groups[5].Value))
                 {
-                    foreach (var rightItem in fork(match.Groups[5].Value))
+                    foreach (var rightItem in fork(match.Groups[5].Value, pageStore, linkParseStrategy))
                     {
                         yield return rightItem;
                     }

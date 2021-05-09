@@ -17,7 +17,11 @@ namespace Chronicle.Tests
             userStore.AddUser(new User() { Name = "Gamma" });
             userStore.AddUser(new User() { Name = "Delta" });
 
-            var page = Page.Parse(@"
+            var pageStore = new PageStore();
+            pageStore.AddPage(new Page() { Title = "Page2" });
+
+            var page = new Page();
+            page.Parse(@"
 title(Test Page)
 editors(a(Beta))
 
@@ -32,7 +36,7 @@ This is the naked second block **with** *formatting*
 This block [[Page2|has a link]] and special permissions
 ]]]
 
-", userStore);
+", userStore, pageStore);
 
         }
     }

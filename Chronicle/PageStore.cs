@@ -32,6 +32,11 @@ namespace Chronicle
             _titlesByPage[page.ID] = page.Title;
         }
 
+        public Page GetPage(Guid id)
+        {
+            return _pages[id];
+        }
+
         public Page GetPage(string title)
         {
             try
