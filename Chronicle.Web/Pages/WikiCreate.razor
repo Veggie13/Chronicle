@@ -1,4 +1,4 @@
-﻿@page "/edit/{title}"
+﻿@page "/create"
 @inject IPageStore PageStore
 @inject IUserStore UserStore
 @inject NavigationManager NavigationManager
@@ -8,9 +8,14 @@
         <EditForm EditContext="@Context" OnValidSubmit="@SavePage">
             <table width="100%">
                 <tr>
-                    <td width="100%">
-                        <h3>Editing: @Title</h3>
+                    <td>
+                        <h3>Title:</h3>
                     </td>
+                    <td width="10px" />
+                    <td width="100%">
+                        <h3><InputText style="width: 100%;" @bind-Value="@Title" /></h3>
+                    </td>
+                    <td width="10px" />
                     <td align="right">
                         <button type="submit">Save</button>
                     </td>
@@ -19,7 +24,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <td colspan="3" width="100%">
+                    <td colspan="6" width="100%">
                         <InputTextArea style="width: 100%; height: 500px;" @bind-Value="@Content" />
                     </td>
                 </tr>
@@ -32,19 +37,11 @@
     [CascadingParameter]
     Task<AuthenticationState> AuthenticationStateTask { get; set; }
 
-    [Parameter]
-    public string Title { get; set; }
-
     public EditContext Context { get; set; }
     public string Content { get; set; }
+    public string Title { get; set; }
 
-    public Page Page { get; set; }
     public User User { get; set; }
-
-    public bool CanUserEdit
-    {
-        get { return Page.Author == User || Page.EditPermission.IsPermitted(User); }
-    }
 
     protected override async Task OnParametersSetAsync()
     {
@@ -60,14 +57,6 @@
         {
             User = UserStore.GetUser(authState.User.Identity.Name);
         }
-
-        Page = PageStore.GetPage(Title);
-        Content = Page.ToString();
-
-        if (!CanUserEdit)
-        {
-            NavigationManager.NavigateTo($"/pages/{Title}");
-        }
     }
 
     protected override void OnInitialized()
@@ -78,13 +67,18 @@
 
     public void SavePage()
     {
-        Page.Parse(Content, UserStore, PageStore);
-        PageStore.UpdatePage(Page);
-        NavigationManager.NavigateTo($"/pages/{Page.Title}");
+        var page = new Page()
+        {
+            Title = Title,
+            Author = User
+        };
+        page.Parse(Content, UserStore, PageStore);
+        PageStore.AddPage(page);
+        NavigationManager.NavigateTo($"/pages/{page.Title}");
     }
 
     void cancel()
     {
-        NavigationManager.NavigateTo($"/pages/{Title}");
+        NavigationManager.NavigateTo($"/");
     }
 }
