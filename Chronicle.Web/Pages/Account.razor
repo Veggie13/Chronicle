@@ -1,0 +1,118 @@
+﻿@page "/account"
+@inject IPageStore PageStore
+@inject IUserStore UserStore
+@inject NavigationManager NavigationManager
+
+<RedirectIfNotAuthorized>
+    <Contents>
+        <h3>Your Account</h3><hr />
+
+        <EditForm EditContext="@Context" OnValidSubmit="@SaveUser">
+            <p>
+                <label>
+                    Username:
+                    <InputText @bind-Value="@UserName" />
+                </label>
+            </p>
+            <p>
+                @if (ShowPasswordWarning)
+                {
+                    <div style="color:red;">Incorrect password.</div>
+                }
+                <label>
+                    Old Password:
+                    <InputText type="password" @bind-Value="@OldPassword" />
+                </label>
+                <label>
+                    New Password:
+                    <InputText type="password" @bind-Value="@NewPassword" />
+                </label>
+            </p>
+            <p>
+                <button type="submit">Save</button>
+                <button type="button" @onclick="@cancel">Cancel</button>
+            </p>
+        </EditForm>
+    </Contents>
+</RedirectIfNotAuthorized>
+
+@code {
+    [CascadingParameter]
+    Task<AuthenticationState> AuthenticationStateTask { get; set; }
+
+    public EditContext Context { get; set; }
+    public string UserName { get; set; }
+    public string OldPassword { get; set; }
+    public string NewPassword { get; set; }
+    public bool ShowPasswordWarning { get; set; }
+
+    public User User { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+
+        var authState = await AuthenticationStateTask;
+        if (authState?.User?.Identity?.Name == null)
+        {
+            return;
+        }
+
+        if (UserStore.HasUser(authState.User.Identity.Name))
+        {
+            User = UserStore.GetUser(authState.User.Identity.Name);
+            UserName = User.Name;
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        Context = new EditContext(new object());
+    }
+
+    public void SaveUser()
+    {
+        bool changedName = (UserName != User.Name);
+        bool changedPassword = false;
+        if (!string.IsNullOrEmpty(OldPassword))
+        {
+            if (User.Password.Equals(OldPassword))
+            {
+                ShowPasswordWarning = false;
+                changedPassword = true;
+            }
+            else
+            {
+                ShowPasswordWarning = true;
+                StateHasChanged();
+                return;
+            }
+        }
+
+        if (changedName)
+        {
+            User.Name = UserName;
+        }
+        if (changedPassword)
+        {
+            User.Password = HashedPassword.Create(NewPassword);
+        }
+        if (changedName || changedPassword)
+        {
+            UserStore.UpdateUser(User);
+        }
+
+        NavigationManager.NavigateTo("/logout?returnUrl=/", true);
+    }
+
+    void cancel()
+    {
+        NavigationManager.NavigateTo("/");
+    }
+
+    private string encode(string param)
+    {
+        return System.Web.HttpUtility.UrlEncode(param);
+    }
+}
