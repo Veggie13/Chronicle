@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chronicle", "Chronicle\Chro
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chronicle.Tests", "Chronicle.Tests\Chronicle.Tests.csproj", "{F09EAA6B-9990-46B7-81B4-489C26856760}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chronicle.Generator", "Chronicle.Generator\Chronicle.Generator.csproj", "{A8CCB944-F9EB-4480-902A-AE83BC5C9960}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{F09EAA6B-9990-46B7-81B4-489C26856760}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F09EAA6B-9990-46B7-81B4-489C26856760}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F09EAA6B-9990-46B7-81B4-489C26856760}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A8CCB944-F9EB-4480-902A-AE83BC5C9960}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A8CCB944-F9EB-4480-902A-AE83BC5C9960}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A8CCB944-F9EB-4480-902A-AE83BC5C9960}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A8CCB944-F9EB-4480-902A-AE83BC5C9960}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
