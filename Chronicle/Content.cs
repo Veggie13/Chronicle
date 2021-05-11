@@ -142,7 +142,7 @@ namespace Chronicle
                 };
                 if (string.IsNullOrEmpty(match.Groups[4].Value))
                 {
-                    item.Text = match.Groups[2].Value;
+                    item.Text = item.Link.Title;
                 }
                 else
                 {

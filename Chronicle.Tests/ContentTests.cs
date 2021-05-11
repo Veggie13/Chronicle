@@ -22,6 +22,10 @@ namespace Chronicle.Tests
 
             content = Content.Parse("There *you* are you **ugly** piece of ***text*** full of [[links]] with [[more|alt-text]] and **[[overformattedness]]**", pageStore);
             Assert.AreEqual(12, content.Children.Count);
+
+            string contentString = content.Serialized();
+            var content2 = Content.Deserialize(contentString, pageStore);
+            Assert.AreEqual(contentString, content2.Serialized());
         }
     }
 }
