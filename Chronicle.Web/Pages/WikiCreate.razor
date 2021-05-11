@@ -3,6 +3,8 @@
 @inject IUserStore UserStore
 @inject NavigationManager NavigationManager
 
+<SetTitle Value="Chronicle - New Page" />
+
 <RedirectIfNotAuthorized>
     <Contents>
         <EditForm EditContext="@Context" OnValidSubmit="@SavePage">
@@ -38,8 +40,8 @@
     Task<AuthenticationState> AuthenticationStateTask { get; set; }
 
     public EditContext Context { get; set; }
-    public string Content { get; set; }
-    public string Title { get; set; }
+    public string Content { get; set; } = "";
+    public string Title { get; set; } = "";
 
     public User User { get; set; }
 

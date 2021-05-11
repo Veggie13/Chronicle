@@ -3,6 +3,8 @@
 @inject IUserStore UserStore
 @inject NavigationManager NavigationManager
 
+<SetTitle Value="@PageTitle" />
+
 <RedirectIfNotAuthorized>
     <Contents>
         <EditForm EditContext="@Context" OnValidSubmit="@SavePage">
@@ -34,6 +36,8 @@
 
     [Parameter]
     public string Title { get; set; }
+
+    public string PageTitle { get { return $"Chronicle - {Title}"; } }
 
     public EditContext Context { get; set; }
     public string Content { get; set; }

@@ -1,8 +1,10 @@
 ﻿@page "/pages/{title}"
 @inject IPageStore PageStore
 @inject IUserStore UserStore
-@inject NavigationManager NavigationManager 
+@inject NavigationManager NavigationManager
 @using System.Linq
+
+<SetTitle Value="@PageTitle" />
 
 <RedirectIfNotAuthorized>
     <Contents>
@@ -39,6 +41,8 @@
 
     [Parameter]
     public string Title { get; set; }
+
+    public string PageTitle { get { return $"Chronicle - {Title}"; } }
 
     public Page Page { get; set; }
     public User User { get; set; }

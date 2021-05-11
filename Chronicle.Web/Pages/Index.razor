@@ -1,18 +1,22 @@
 ﻿@page "/"
 @inject IPageStore PageStore
 
+<SetTitle Value="Chronicle" />
+
 <AuthorizeView>
     <Authorized Context="Auth">
         <h1>Chronicle</h1><hr />
 
         <WikiPageNavigator ShowIndex="false" />
 
-        <p>
+        <div style="display:flex; flex-flow:row wrap;">
             @foreach (var storedPage in PageStore.Pages.OrderBy(p => p.Title))
             {
-                <a href="/pages/@storedPage.Title">@storedPage.Title</a><br />
+                <div style="width:150px; margin-right:20px; margin-top:20px;">
+                    <a href="/pages/@storedPage.Title">@storedPage.Title</a>
+                </div>
             }
-        </p>
+        </div>
     </Authorized>
 
     <NotAuthorized>

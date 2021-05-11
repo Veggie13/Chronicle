@@ -1,0 +1,12 @@
+﻿@inject IJSRuntime JS 
+
+@code {
+    [Parameter]
+    public string Value { get; set; } = "";
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        JS.InvokeVoidAsync("setTitle", Value);
+    }
+}
