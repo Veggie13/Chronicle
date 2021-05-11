@@ -10,10 +10,10 @@ namespace Chronicle
         public FileApplicationContext(string repoPath)
         {
             RepositoryFolder = new DirectoryInfo(repoPath);
-            PageFolder = RepositoryFolder.GetDirectories("pages")[0];
-            UserListFile = RepositoryFolder.GetFiles("users.txt")[0];
-            AuthorsFile = RepositoryFolder.GetFiles("authors.txt")[0];
-            IndexFile = RepositoryFolder.GetFiles("index.txt")[0];
+            PageFolder = new DirectoryInfo(Path.Combine(RepositoryFolder.FullName, "pages"));
+            UserListFile = new FileInfo(Path.Combine(RepositoryFolder.FullName, "users.txt"));
+            AuthorsFile = new FileInfo(Path.Combine(RepositoryFolder.FullName, "authors.txt"));
+            IndexFile = new FileInfo(Path.Combine(RepositoryFolder.FullName, "index.txt"));
         }
 
         public DirectoryInfo RepositoryFolder { get; private set; }
